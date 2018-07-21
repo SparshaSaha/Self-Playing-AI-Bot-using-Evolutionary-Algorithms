@@ -1,5 +1,15 @@
 import pygame
+from Sprites.Player import Player
+
+
+def drawGameWindow(player):
+    screen.fill(background_colour)
+    player.drawCharacter(screen)
+    pygame.display.update()
+
+
 pygame.init()
+clock = pygame.time.Clock()
 background_colour = (255,255,255)
 (width, height) = (1370, 750)
 screen = pygame.display.set_mode((width, height))
@@ -8,13 +18,15 @@ screen.fill(background_colour)
 pygame.display.flip()
 
 x = 30
-y = 650
+y = 600
 
 direction = -1
+tRex = Player(x, y, 10, 10);
 
 running = True
 jump = False
 while running:
+    clock.tick(500)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -26,13 +38,10 @@ while running:
         if keys[pygame.K_SPACE]:
             jump = True
     else:
-        y += 1 * direction
-        if y < 600 :
+        tRex.y += 0.75 * direction
+        if tRex.y < 550 :
             direction = 1;
-        elif y == 650:
+        elif tRex.y == y:
             direction = -1;
             jump = False
-
-    screen.fill(background_colour)
-    pygame.draw.rect(screen, (0, 0, 0), (x, y, 10, 10))
-    pygame.display.update()
+    drawGameWindow(tRex)
