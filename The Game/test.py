@@ -3,6 +3,7 @@ import random
 from Sprites.Player import Player
 from Sprites.CactusSingle import CactusSingle
 from Sprites.CactusDouble import CactusDouble
+from Sprites.CactusTriple import CactusTriple
 
 obstacleProbability = 0.5
 global obstaclesOnScreen
@@ -20,13 +21,15 @@ def drawCharacter():
     pygame.display.update()
 
 def generateGameObstacles():
-    if len(obstaclesOnScreen) == 0 or obstaclesOnScreen[len(obstaclesOnScreen) - 1].x < 1000:
+    if len(obstaclesOnScreen) == 0 or obstaclesOnScreen[len(obstaclesOnScreen) - 1].x < 1100:
         if random.uniform(0,1) < obstacleProbability:
             obstacleNumber = random.randint(0,6)
             if obstacleNumber <= 2:
-                obstaclesOnScreen.append(CactusSingle(1370, 620))
+                obstaclesOnScreen.append(CactusSingle(1370, 615))
             elif obstacleNumber <= 4:
-                obstaclesOnScreen.append(CactusDouble(1370, 620))
+                obstaclesOnScreen.append(CactusDouble(1370, 615))
+            else:
+                obstaclesOnScreen.append(CactusTriple(1370, 615))
 
 def cleanDeadObstaclesAndPropagate(obstacles):
     index = 0;
@@ -56,8 +59,6 @@ y = 600
 
 direction = -1
 tRex = Player(x, y)
-cactusSingle = CactusSingle(1370, 620)
-
 
 running = True
 jump = False
@@ -74,12 +75,7 @@ while running:
         if keys[pygame.K_SPACE]:
             jump = True
     else:
-        tRex.y += 2 * direction
-        if tRex.y < 520 :
-            direction = 1
-        elif tRex.y == y:
-            direction = -1
-            jump = False
+        jump, direction = tRex.jump(jump, direction)
 
     drawGameBackground()
     generateGameObstacles()
