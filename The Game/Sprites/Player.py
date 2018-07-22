@@ -3,7 +3,7 @@ class Player(object):
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.hitbox = (self.x, self.y, 50, 50)
+        self.hitbox = (self.x, self.y, 41, 40)
         self.imageName = "Sprites/GameImages/tRex.png"
 
     def drawCharacter(self, canvas):
