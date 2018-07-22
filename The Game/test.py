@@ -5,10 +5,11 @@ from Sprites.CactusSingle import CactusSingle
 from Sprites.CactusDouble import CactusDouble
 from Sprites.CactusTriple import CactusTriple
 
-obstacleProbability = 0.5
+obstacleProbability = 0.01
 global obstaclesOnScreen
 obstaclesOnScreen = []
-speed = 2
+speed = 1.5
+lastQuotient = 0;
 score = 0
 font_name = pygame.font.match_font('arial')
 
@@ -29,20 +30,20 @@ def drawCharacter():
         obstacles.drawCharacter(screen)
 
 def generateGameObstacles():
-    if len(obstaclesOnScreen) == 0 or obstaclesOnScreen[len(obstaclesOnScreen) - 1].x < 1100:
+    if len(obstaclesOnScreen) == 0 or obstaclesOnScreen[len(obstaclesOnScreen) - 1].x < 650:
         if random.uniform(0,1) < obstacleProbability:
             obstacleNumber = random.randint(0,6)
             if obstacleNumber <= 2:
-                obstaclesOnScreen.append(CactusSingle(1370, 615))
+                obstaclesOnScreen.append(CactusSingle(900, 615))
             elif obstacleNumber <= 4:
-                obstaclesOnScreen.append(CactusDouble(1370, 615))
+                obstaclesOnScreen.append(CactusDouble(900, 615))
             else:
-                obstaclesOnScreen.append(CactusTriple(1370, 615))
+                obstaclesOnScreen.append(CactusTriple(900, 615))
 
 def cleanDeadObstaclesAndPropagate(obstacles, score):
     index = 0
     for obstacle in obstacles:
-        if obstacle.x >= 0:
+        if obstacle.x >= 70:
             break
         else:
             score += 1
@@ -59,13 +60,13 @@ def cleanDeadObstaclesAndPropagate(obstacles, score):
 pygame.init()
 clock = pygame.time.Clock()
 background_colour = (255,255,255)
-(width, height) = (1370, 750)
+(width, height) = (900, 750)
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption('T-Rex')
 drawGameBackground()
 pygame.display.flip()
 
-x = 30
+x = 90
 y = 600
 
 direction = -1
@@ -99,8 +100,13 @@ while running:
         generateGameObstacles()
         obstaclesOnScreen, score = cleanDeadObstaclesAndPropagate(obstaclesOnScreen, score)
         drawCharacter()
-        drawText(screen, 'score: ' + str(score), 30, 1200, 100)
+        drawText(screen, 'score: ' + str(score), 30, 700, 100)
         pygame.display.update()
 
     if len(obstaclesOnScreen) > 0 and tRex.detectCollision(obstaclesOnScreen[0]):
         gameOver = True
+        speed = 1.5
+
+    if score // 10 > lastQuotient:
+        lastQuotient += 1
+        speed += 0.2
