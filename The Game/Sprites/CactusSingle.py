@@ -4,7 +4,7 @@ class CactusSingle(object):
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.hitbox = (self.x, self.y, 17, 30)
+        self.hitbox = (0, 0, 0, 0)
         self.imageName = "Sprites/GameImages/smallCactus.png"
 
     def drawCharacter(self, canvas):

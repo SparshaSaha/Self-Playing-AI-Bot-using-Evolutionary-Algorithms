@@ -4,6 +4,7 @@ from Sprites.Player import Player
 from Sprites.CactusSingle import CactusSingle
 from Sprites.CactusDouble import CactusDouble
 from Sprites.CactusTriple import CactusTriple
+from Sprites.Bird import Bird
 
 obstacleProbability = 0.01
 global obstaclesOnScreen
@@ -11,6 +12,7 @@ obstaclesOnScreen = []
 speed = 1.5
 lastQuotient = 0;
 score = 0
+tRexIndex = 0;
 font_name = pygame.font.match_font('arial')
 
 def drawText(surf, text, size, x, y):
@@ -25,20 +27,23 @@ def drawGameBackground():
 
 
 def drawCharacter():
-    tRex.drawCharacter(screen)
+    tRex.drawCharacter(screen, tRexIndex)
     for obstacles in obstaclesOnScreen:
         obstacles.drawCharacter(screen)
 
 def generateGameObstacles():
     if len(obstaclesOnScreen) == 0 or obstaclesOnScreen[len(obstaclesOnScreen) - 1].x < 650:
         if random.uniform(0,1) < obstacleProbability:
-            obstacleNumber = random.randint(0,6)
-            if obstacleNumber <= 2:
+            obstacleNumber = random.randint(0,9)
+            if obstacleNumber <= 3:
                 obstaclesOnScreen.append(CactusSingle(900, 615))
-            elif obstacleNumber <= 4:
+            elif obstacleNumber <= 5:
                 obstaclesOnScreen.append(CactusDouble(900, 615))
-            else:
+            elif obstacleNumber <= 7:
                 obstaclesOnScreen.append(CactusTriple(900, 615))
+            else:
+                obstaclesOnScreen.append(Bird(900, 590))
+
 
 def cleanDeadObstaclesAndPropagate(obstacles, score):
     index = 0
@@ -75,6 +80,7 @@ tRex = Player(x, y)
 running = True
 jump = False
 gameOver = False
+
 while running:
     clock.tick(175)
     for event in pygame.event.get():
@@ -89,8 +95,13 @@ while running:
         score = 0
         obstaclesOnScreen = []
 
+    if keys[pygame.K_DOWN] and not jump:
+        tRexIndex = 1
+    else:
+        tRexIndex = 0
+
     if not jump:
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_UP]:
             jump = True
     else:
         jump, direction = tRex.jump(jump, direction)
