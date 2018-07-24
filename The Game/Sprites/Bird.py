@@ -7,13 +7,13 @@ class Bird(object):
         self.hitbox = (0, 0, 0, 0)
         self.frameCount = 0;
         self.images = ["Sprites/GameImages/birdUp.png", "Sprites/GameImages/birdDown.png"]
-        self.index = 0
+        self.flipState = 0
 
     def drawCharacter(self, canvas):
         if self.frameCount % 50 == 0:
-            self.index = self.flip(self.index)
+            self.flipState = self.flip(self.flipState)
 
-        canvas.blit(pygame.image.load(self.images[self.index]), (self.x,self.y))
+        canvas.blit(pygame.image.load(self.images[self.flipState]), (self.x,self.y))
         self.hitbox = (self.x, self.y, 45, 27)
         self.frameCount += 1
 
