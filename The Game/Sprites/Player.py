@@ -32,12 +32,12 @@ class Player(object):
 
         #pygame.draw.rect(canvas, (255, 0, 0), self.hitbox,2)
 
-    def jump(self, jump, direction):
-        self.y[0] += 2 * direction
-        if self.y[0] < 510 :
+    def jump(self, jump, direction, jumpSpeed):
+        self.y[0] += jumpSpeed * direction
+        if self.y[0] < 410 :
             direction = 1
             return  True, direction
-        elif self.y[0] == 600:
+        elif self.y[0] >= 500:
             direction = -1
             return False, direction
         else:

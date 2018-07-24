@@ -5,50 +5,65 @@ from Sprites.CactusSingle import CactusSingle
 from Sprites.CactusDouble import CactusDouble
 from Sprites.CactusTriple import CactusTriple
 from Sprites.Bird import Bird
+from Logger import Logger
 
+# Game Variables
 obstacleProbability = 0.01
-global obstaclesOnScreen
 obstaclesOnScreen = []
-speed = 1.5
-lastQuotient = 0;
+speed = 3.0
+lastQuotient = 0
 score = 0
-tRexIndex = 0;
-font_name = pygame.font.match_font('arial')
+tRexIndex = 0
+direction = -1
+running = True
+jump = False
+gameOver = False
+jumpSpeed = 3.2
+fontName = pygame.font.match_font('arial')
+clock = pygame.time.Clock()
+background_colour = (255,255,255)
+(width, height) = (900, 600)
 
+# Display Score on Screen
 def drawText(surf, text, size, x, y):
-    font = pygame.font.Font(font_name, size)
-    text_surface = font.render(text, True, (0, 0, 0))
-    text_rect = text_surface.get_rect()
-    text_rect.midtop = (x, y)
-    surf.blit(text_surface, text_rect)
+    font = pygame.font.Font(fontName, size)
+    textSurface = font.render(text, True, (0, 0, 0))
+    textRect = textSurface.get_rect()
+    textRect.midtop = (x, y)
+    surf.blit(textSurface, textRect)
 
+# Draw the game background
 def drawGameBackground():
     screen.fill(background_colour)
 
-
+# Draw TRex and all obstacles on Screen
 def drawCharacter():
     tRex.drawCharacter(screen, tRexIndex)
     for obstacles in obstaclesOnScreen:
         obstacles.drawCharacter(screen)
 
+# Randomly generate game obstacles depending on obstacle probability
 def generateGameObstacles():
     if len(obstaclesOnScreen) == 0 or obstaclesOnScreen[len(obstaclesOnScreen) - 1].x < 650:
         if random.uniform(0,1) < obstacleProbability:
-            obstacleNumber = random.randint(0,9)
-            if obstacleNumber <= 3:
-                obstaclesOnScreen.append(CactusSingle(900, 615))
-            elif obstacleNumber <= 5:
-                obstaclesOnScreen.append(CactusDouble(900, 615))
-            elif obstacleNumber <= 7:
-                obstaclesOnScreen.append(CactusTriple(900, 615))
-            else:
-                obstaclesOnScreen.append(Bird(900, 590))
+            #obstacleNumber = random.randint(0,11)
+            #if obstacleNumber <= 4:
+            obstaclesOnScreen.append(CactusSingle(900, 515))
+            #elif obstacleNumber <= 6:
+            #    obstaclesOnScreen.append(CactusDouble(900, 515))
+            #elif obstacleNumber <= 8:
+            #    obstaclesOnScreen.append(CactusTriple(900, 515))
+            #elif obstacleNumber <= 9 and score >= 25:
+            #    obstaclesOnScreen.append(Bird(900, 490))
+            #elif score >= 30:
+            #    obstaclesOnScreen.append(Bird(900, 515))
 
-
+# Remove dead obstacles from obstacle array
 def cleanDeadObstaclesAndPropagate(obstacles, score):
     index = 0
     for obstacle in obstacles:
-        if obstacle.x >= 70:
+        if obstacle.x > 100:
+            lastDistance = 900
             break
         else:
             score += 1
@@ -60,29 +75,24 @@ def cleanDeadObstaclesAndPropagate(obstacles, score):
     return obstacles, score
 
 
-
+# 0 - jump
+# 1 - duck
+# 2 - nothing
 
 pygame.init()
-clock = pygame.time.Clock()
-background_colour = (255,255,255)
-(width, height) = (900, 750)
+logger = Logger(1)
+action = 0;
 screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption('T-Rex')
+pygame.display.set_caption('T-Rex Runner')
 drawGameBackground()
 pygame.display.flip()
 
-x = 90
-y = 600
+lastpos = 900
 
-direction = -1
-tRex = Player(x, y)
-
-running = True
-jump = False
-gameOver = False
-
+tRex = Player(90, 500)
 while running:
-    clock.tick(175)
+    action = 2
+    clock.tick(100)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -97,27 +107,39 @@ while running:
 
     if keys[pygame.K_DOWN] and not jump:
         tRexIndex = 1
+        action = 1
     else:
         tRexIndex = 0
 
     if not jump:
         if keys[pygame.K_UP]:
             jump = True
+            action = 0
     else:
-        jump, direction = tRex.jump(jump, direction)
+        jump, direction = tRex.jump(jump, direction, jumpSpeed)
+        action = -1
 
     if not gameOver:
         drawGameBackground()
         generateGameObstacles()
         obstaclesOnScreen, score = cleanDeadObstaclesAndPropagate(obstaclesOnScreen, score)
         drawCharacter()
-        drawText(screen, 'score: ' + str(score), 30, 700, 100)
+        drawText(screen, 'score: ' + str(score), 20, 700, 50)
         pygame.display.update()
 
     if len(obstaclesOnScreen) > 0 and tRex.detectCollision(obstaclesOnScreen[0]):
         gameOver = True
         speed = 1.5
+        break
 
     if score // 10 > lastQuotient:
         lastQuotient += 1
-        speed += 0.2
+        speed += 0.5
+        jumpSpeed += 0.1
+
+    # Logging
+    if len(obstaclesOnScreen) != 0:
+        if (lastpos - obstaclesOnScreen[0].x) > speed * 15.0  or action != 2:
+            if obstaclesOnScreen[0].x - 120 > 0 and action != -1:
+                logger.logData(1, speed, action, obstaclesOnScreen[0].x - 115)
+            lastpos = obstaclesOnScreen[0].x
