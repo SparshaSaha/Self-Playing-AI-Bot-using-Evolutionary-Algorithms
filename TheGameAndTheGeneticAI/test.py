@@ -1,5 +1,6 @@
 import pygame
 import random
+import pickle
 import numpy as np
 from Sprites.Player import Player
 from Sprites.CactusSingle import CactusSingle
@@ -23,6 +24,7 @@ clock = pygame.time.Clock()
 background_colour = (255,255,255)
 (width, height) = (900, 600)
 frameCount = 0
+generation = 1
 
 # Display Score on Screen
 def drawText(surf, text, size, x, y):
@@ -84,7 +86,7 @@ def getObstacleIndex(name):
 
 def detectCollisionAndKillTRex():
     for trex in tRex:
-        if trex.detectCollision(obstaclesOnScreen[0]):
+        if trex.detectCollision(obstaclesOnScreen[0]) and trex.alive:
             trex.score = score
             trex.alive = False
 
@@ -101,12 +103,56 @@ def countAlive():
     for trex in tRex:
         if trex.alive:
             count += 1
-    print(count)
 
     if count == 0:
         return True
     else:
         return False
+
+def BuildNextGeneration():
+    newTrexs = []
+    tRex.sort(key=lambda x: x.score, reverse=True)
+
+    # Keep 3 top scorers as it is
+    newTrexs.append(tRex[0])
+    newTrexs.append(tRex[1])
+    newTrexs.append(tRex[2])
+
+    # Saving best weights
+    with open('inputWts', 'wb') as fp:
+        pickle.dump(tRex[0].inputWeights.tolist(), fp)
+
+    with open('outputWts', 'wb') as fp:
+        pickle.dump(tRex[0].outputWeights.tolist(), fp)
+
+
+
+    bestTwo = Player(90, 500)
+    bestTwo.crossOver(tRex[0], tRex[1])
+    newTrexs.append(bestTwo)
+
+    bestAndWorst = Player(90, 500)
+    bestAndWorst.crossOver(tRex[0], tRex[len(tRex) - 1])
+    newTrexs.append(bestAndWorst)
+
+    for i in range(0, len(tRex) - 20):
+        par1 = tRex[random.randint(0, len(tRex)-1)]
+        par2 = tRex[random.randint(0, len(tRex)-1)]
+
+        child = Player(90, 500)
+        child.crossOver(par1, par2)
+        newTrexs.append(child)
+
+    return newTrexs
+
+
+def aliveCount():
+    cnt = 0;
+    for i in tRex:
+        if i.alive:
+            cnt+=1
+    return cnt
+
 
 
 
@@ -122,7 +168,7 @@ pygame.display.set_caption('T-Rex Runner')
 drawGameBackground()
 pygame.display.flip()
 
-tRex = [Player(90, 500), Player(90, 500), Player(90, 500), Player(90, 500), Player(90, 500), Player(90, 500)]
+tRex = [Player(90, 500) for i in range(0, 1000)]
 
 while running:
     clock.tick(100)
@@ -158,7 +204,14 @@ while running:
 
 
     makeTrexsJump()
-    restart = countAlive()
+
+    if countAlive() :
+        tRex = BuildNextGeneration()
+        generation += 1
+        obstaclesOnScreen.clear()
+        score = 0
+
+
 
 
     if not gameOver:
@@ -167,6 +220,10 @@ while running:
         obstaclesOnScreen, score = cleanDeadObstaclesAndPropagate(obstaclesOnScreen, score)
         drawCharacter()
         drawText(screen, 'score: ' + str(score), 20, 700, 50)
+        drawText(screen, 'Generation Count: ' + str(len(tRex)), 10, 100, 50)
+        drawText(screen, 'Generation: ' + str(generation), 10, 100, 70)
+        drawText(screen, 'Generation Alive: ' + str(aliveCount()),10 ,200, 50)
+
         pygame.display.update()
 
     if len(obstaclesOnScreen) > 0:

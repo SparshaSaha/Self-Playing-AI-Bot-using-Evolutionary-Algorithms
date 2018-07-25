@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-import tensorflow as tf
+import random
 class Player(object):
     def __init__(self, x, y):
 
@@ -84,5 +84,33 @@ class Player(object):
             else:
                 return 1
 
-    def crossOver(parent1, parent2):
-        
+    def crossOver(self, parent1, parent2):
+        parent1InputWeights = parent1.inputWeights.tolist()
+        parent2InputWeights = parent2.inputWeights.tolist()
+
+        parent1OutputWeights = parent1.outputWeights.tolist()
+        parent2OutputWeights = parent1.outputWeights.tolist()
+
+        # Fix Input inputWeights
+        mid = random.randint(0, self.inputNodes)
+
+        self.inputWeights = []
+
+        for i in range(0, mid):
+            self.inputWeights.append(parent1InputWeights[i])
+        for i in range(mid, self.inputNodes):
+            self.inputWeights.append(parent2InputWeights[i])
+
+        self.inputWeights = np.array(self.inputWeights)
+
+        # Fix Output Weights
+        mid = random.randint(0, self.hiddenNodes)
+
+        self.outputWeights = []
+
+        for i in range(0, mid):
+            self.outputWeights.append(parent1OutputWeights[i])
+        for i in range(mid, self.hiddenNodes):
+            self.outputWeights.append(parent2OutputWeights[i])
+
+        self.outputWeights = np.array(self.outputWeights)
