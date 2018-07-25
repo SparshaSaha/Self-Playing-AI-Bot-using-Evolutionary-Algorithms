@@ -1,7 +1,18 @@
 import pygame
+import numpy as np
 import tensorflow as tf
 class Player(object):
     def __init__(self, x, y):
+
+        # Define the Neural Network
+        self.inputNodes = 3
+        self.outputNodes = 2
+        self.hiddenNodes = 9
+
+        self.inputWeights = np.random.rand(self.inputNodes, self.hiddenNodes)
+        self.outputWeights = np.random.rand(self.hiddenNodes, self.outputNodes)
+
+        # Define player properties
         self.x = x
         self.y = [y, y + 20, y]
         self.hitbox = (self.x, self.y[0], 38, 40)
@@ -10,7 +21,21 @@ class Player(object):
         self.frameCount = 0
         self.index = 0
         self.currentImageIndex = 0
+        self.score = 0
+        self.alive = True
+        self.isJumping = False
+        self.direction = -1
+        self.predictedAction = 0
         self.imageName = ["Sprites/GameImages/tRexLeftLeg.png", "Sprites/GameImages/tRexDuck.png", "Sprites/GameImages/tRexRightLeg.png", "Sprites/GameImages/tRexDuckRight.png"]
+
+
+    def predict(self, userInput):
+        hiddenLayer = np.dot(userInput, self.inputWeights)
+        hiddenLayer =  1.0 / (1.0 + np.exp(-1.0 * hiddenLayer))
+        outputLayer = np.matmul(hiddenLayer, self.outputWeights)
+        outputLayer =  1.0 / (1.0 + np.exp(-1.0 * outputLayer))
+
+        return outputLayer.tolist()
 
     def drawCharacter(self, canvas, index):
         if self.frameCount % 10 == 0 or index != self.index:
@@ -58,3 +83,6 @@ class Player(object):
                 return 3
             else:
                 return 1
+
+    def crossOver(parent1, parent2):
+        
