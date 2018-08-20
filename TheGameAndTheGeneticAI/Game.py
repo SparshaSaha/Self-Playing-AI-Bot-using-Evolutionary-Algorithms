@@ -26,7 +26,7 @@ class Game(object):
         self.width = 900
         self.height = 600
         self.frameCount = 0
-        self.screen = pygame.display.set_mode((width, height))
+        self.screen = pygame.display.set_mode((self.width, self.height))
         self.trex = Player(90, 500)
     
 
@@ -63,10 +63,38 @@ class Game(object):
                     self.obstaclesOnScreen.append(CactusTriple(900, 515))
     
     def detectCollisionAndKillTRex(self):
-        if trex.detectCollision(self.obstaclesOnScreen[0]) and self.trex.alive:
-            trex.score = score
-            trex.alive = False
+        if self.trex.detectCollision(self.obstaclesOnScreen[0]) and self.trex.alive:
+            self.trex.score = score
+            self.trex.alive = False
+
     
+    def makeTrexsJump(self):
+        
+        if not self.trex.isJumping:
+            if self.trex.predictedAction == 1:
+                self.trex.isJumping = True
+        else:
+            self.trex.isJumping, self.trex.direction = self.trex.jump(self.trex.isJumping, self.trex.direction, self.jumpSpeed)
+    
+
+    def game(self):
+        pygame.init()
+        pygame.display.set_caption('T-Rex Runner')
+        self.drawGameBackground()
+        pygame.display.flip()
+
+        while self.running:
+            self.clock.tick(100)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    break
+            
+            
+
+g = Game()
+g.game()   
     
 
 
