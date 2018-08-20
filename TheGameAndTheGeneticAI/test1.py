@@ -41,27 +41,21 @@ def drawGameBackground():
 def drawCharacter():
     for trex in tRex:
         if trex.alive == True:
-            if trex.predictedAction == 2:
-                trex.drawCharacter(screen, 1)
-            else:
-                trex.drawCharacter(screen, 0)
+            trex.drawCharacter(screen, 0)
     for obstacles in obstaclesOnScreen:
         obstacles.drawCharacter(screen)
 
 # Randomly generate game obstacles depending on obstacle probability
 def generateGameObstacles():
-    if len(obstaclesOnScreen) == 0 or obstaclesOnScreen[len(obstaclesOnScreen) - 1].x < 650:
+    if len(obstaclesOnScreen) == 0 or obstaclesOnScreen[len(obstaclesOnScreen) - 1].x < 600:
         if random.uniform(0,1) < obstacleProbability:
-            obstacleNumber = random.randint(0, 3)
-            if obstacleNumber == 0:
+            obstacleNumber = random.randint(0, 9)
+            if obstacleNumber <= 4:
                 obstaclesOnScreen.append(CactusSingle(900, 515))
-            elif obstacleNumber == 1:
+            elif obstacleNumber <= 6:
                 obstaclesOnScreen.append(CactusDouble(900, 515))
-            elif obstacleNumber == 2:
+            elif obstacleNumber <= 8:
                 obstaclesOnScreen.append(CactusTriple(900, 515))
-            elif obstacleNumber == 3:
-                obstaclesOnScreen.append(Bird(900, 490))
-
 
 
 # Remove dead obstacles from obstacle array
@@ -80,17 +74,14 @@ def cleanDeadObstaclesAndPropagate(obstacles, score):
         obstacle.propagate(speed)
     return obstacles, score
 
-def getObstacleInfo(name):
+def getObstacleIndex(name):
     if name == "CactusSingle":
-        return 1, 0
+        return 1
 
     if name == "CactusDouble":
-        return 2, 0
+        return 2
 
-    if name == "Bird":
-        return 4, 10
-
-    return 3, 0
+    return 3
 
 def detectCollisionAndKillTRex():
     for trex in tRex:
@@ -123,18 +114,18 @@ def BuildNextGeneration():
 
     # Keep 3 top scorers as it is
     tRex[0].jumpSpeed = 3.2
-    tRex[0].alive = True
-    tRex[1].alive = True
     tRex[1].jumpSpeed = 3.2
+    tRex[2].jumpSpeed = 3.2
     newTrexs.append(tRex[0])
     newTrexs.append(tRex[1])
+    newTrexs.append(tRex[2])
 
     # Saving best weights
-    with open('inputWts', 'wb') as fp:
-        pickle.dump(tRex[0].inputWeights.tolist(), fp)
+    #with open('inputWts', 'wb') as fp:
+    #    pickle.dump(tRex[0].inputWeights.tolist(), fp)
 
-    with open('outputWts', 'wb') as fp:
-        pickle.dump(tRex[0].outputWeights.tolist(), fp)
+    #with open('outputWts', 'wb') as fp:
+    #    pickle.dump(tRex[0].outputWeights.tolist(), fp)
 
 
 
@@ -146,7 +137,7 @@ def BuildNextGeneration():
     bestAndWorst.crossOver(tRex[0], tRex[len(tRex) - 1])
     newTrexs.append(bestAndWorst)
 
-    for i in range(0, len(tRex) - 4):
+    for i in range(0, len(tRex) - 20):
         par1 = tRex[random.randint(0, len(tRex)-1)]
         par2 = tRex[random.randint(0, len(tRex)-1)]
 
@@ -179,19 +170,32 @@ pygame.display.set_caption('T-Rex Runner')
 drawGameBackground()
 pygame.display.flip()
 
-tRex = [Player(90, 500) for i in range(0, 500)]
+tRex = [Player(90, 500)]
+inputWt = []
+outputWt = []
+
+with open('inputWts', 'rb') as fp:
+    inputWt = pickle.load(fp)
+
+with open('outputWts', 'rb') as fp:
+    outputWt = pickle.load(fp)
+
+tRex[0].inputWeights = np.array(inputWt)
+tRex[0].outputWeights = np.array(outputWt)
 
 while running:
     clock.tick(100)
 
     if len(obstaclesOnScreen) > 0 and frameCount > 1:
-        height, duck = getObstacleInfo(obstaclesOnScreen[0].__class__.__name__)
+        obstacleNumber = getObstacleIndex(obstaclesOnScreen[0].__class__.__name__)
         for trex in tRex:
             if trex.alive:
-                action = trex.predict(np.array([float(height), duck, float(obstaclesOnScreen[0].x - 120), float(speed)]))
+                action = trex.predict(np.array([float(obstacleNumber), float(obstaclesOnScreen[0].x - 120), float(speed)]))
                 frameCount = 0
-                trex.predictedAction = action.index(max(action))
-
+                if action[0] > action[1]:
+                    trex.predictedAction = 0
+                else:
+                    trex.predictedAction = 1
     frameCount += 1
 
     for event in pygame.event.get():
@@ -235,7 +239,6 @@ while running:
         drawText(screen, 'Generation Count: ' + str(len(tRex)), 15, 100, 50)
         drawText(screen, 'Generation: ' + str(generation), 15, 100, 70)
         drawText(screen, 'Generation Alive: ' + str(aliveCount()),15 ,300, 50)
-        drawText(screen, 'Speed: ' + str(speed),15 ,300, 10)
 
         pygame.display.update()
 
@@ -246,4 +249,3 @@ while running:
         lastQuotient += 1
         speed += 0.5
         jumpSpeed += 0.1
-    print(speed)

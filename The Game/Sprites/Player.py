@@ -1,5 +1,4 @@
 import pygame
-import tensorflow as tf
 class Player(object):
     def __init__(self, x, y):
         self.x = x

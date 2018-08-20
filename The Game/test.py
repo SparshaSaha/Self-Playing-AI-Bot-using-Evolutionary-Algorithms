@@ -34,7 +34,7 @@ def drawText(surf, text, size, x, y):
 
 # Draw the game background
 def drawGameBackground():
-    screen.fill(background_colour)
+    screen.blit(background_colour)
 
 # Draw TRex and all obstacles on Screen
 def drawCharacter():

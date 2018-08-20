@@ -5,9 +5,9 @@ class Player(object):
     def __init__(self, x, y):
 
         # Define the Neural Network
-        self.inputNodes = 3
+        self.inputNodes = 4
         self.outputNodes = 2
-        self.hiddenNodes = 9
+        self.hiddenNodes = 13
 
         self.inputWeights = np.random.rand(self.inputNodes, self.hiddenNodes)
         self.outputWeights = np.random.rand(self.hiddenNodes, self.outputNodes)
@@ -33,6 +33,8 @@ class Player(object):
         hiddenLayer = np.dot(userInput, self.inputWeights)
         hiddenLayer =  1.0 / (1.0 + np.exp(-1.0 * hiddenLayer))
         outputLayer = np.matmul(hiddenLayer, self.outputWeights)
+        temp = userInput[1] * 0.8
+        outputLayer = np.append(outputLayer,temp)
         outputLayer =  1.0 / (1.0 + np.exp(-1.0 * outputLayer))
 
         return outputLayer.tolist()
@@ -43,7 +45,7 @@ class Player(object):
             self.frameCount = 0
             self.index = index
 
-        if index == 0 or index == 2:
+        if index == 0 or index == 2 or self.isJumping:
             self.hitbox = (self.x, self.y[0], 38, 40)
             self.hitboxRectStanding = pygame.Rect(self.x, self.y[0], 41, 40)
             self.hitboxRect = self.hitboxRectStanding
@@ -92,25 +94,44 @@ class Player(object):
         parent2OutputWeights = parent1.outputWeights.tolist()
 
         # Fix Input inputWeights
-        mid = random.randint(0, self.inputNodes)
-
         self.inputWeights = []
 
-        for i in range(0, mid):
-            self.inputWeights.append(parent1InputWeights[i])
-        for i in range(mid, self.inputNodes):
-            self.inputWeights.append(parent2InputWeights[i])
+        for i in range(0, self.inputNodes):
+            arrayChooser = random.randint(0, 1)
+            if arrayChooser == 0:
+                self.inputWeights.append(parent1InputWeights[i])
+            else:
+                self.inputWeights.append(parent2InputWeights[i])
 
-        self.inputWeights = np.array(self.inputWeights)
+
+        self.inputWeights = np.array(self.mutate(self.inputWeights))
 
         # Fix Output Weights
-        mid = random.randint(0, self.hiddenNodes)
 
         self.outputWeights = []
 
-        for i in range(0, mid):
-            self.outputWeights.append(parent1OutputWeights[i])
-        for i in range(mid, self.hiddenNodes):
-            self.outputWeights.append(parent2OutputWeights[i])
+        for i in range(0, self.hiddenNodes):
+            arrayChooser = random.randint(0, 1)
+            if arrayChooser == 0:
+                self.outputWeights.append(parent1OutputWeights[i])
+            else:
+                self.outputWeights.append(parent2OutputWeights[i])
 
-        self.outputWeights = np.array(self.outputWeights)
+        self.outputWeights = np.array(self.mutate(self.outputWeights))
+
+    def mutate(self, array):
+        mutateProb = 0.7
+        if random.uniform(0, 1) > mutateProb:
+            first = random.randint(0, len(array)-1)
+            second = random.randint(0, len(array)-1)
+            temp = array[first]
+            array[first] = array[second]
+            array[second] = temp
+
+
+            first = random.randint(0, len(array)-1)
+            second = random.randint(0, len(array)-1)
+            temp = array[first]
+            array[first] = array[second]
+            array[second] = temp
+        return array
