@@ -8,7 +8,7 @@ fitness_threshold     = 600.0
 pop_size              = 100
 reset_on_extinction   = 0
 
-[DefaultGenome]
+[Player]
 num_inputs              = 3
 num_hidden              = 6
 num_outputs             = 3

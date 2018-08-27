@@ -3,15 +3,17 @@ import random
 import pickle
 import numpy as np
 import neat
-from Sprites.Player import Player
+import os
+#from Sprites.Player import Player
 from Sprites.CactusSingle import CactusSingle
+from Sprites.Player import Player
 from Sprites.CactusDouble import CactusDouble
 from Sprites.CactusTriple import CactusTriple
 from Sprites.Bird import Bird
 
 class Game(object):
 
-    def __init__(self):
+    def __init__(self, tRexArray):
         self.obstacleProbability = 0.01
         self.obstaclesOnScreen = []
         self.speed = 3.0
@@ -28,7 +30,7 @@ class Game(object):
         self.height = 600
         self.frameCount = 0
         self.screen = pygame.display.set_mode((self.width, self.height))
-        self.trex = Player(90, 500)
+        self.trex = tRexArray
     
 
     # Display Score on Screen
@@ -129,14 +131,29 @@ class Game(object):
             if len(self.obstaclesOnScreen) > 0:
                 self.detectCollisionAndKillTRex()
             
-            
+
+
+def eval_genomes(genomes, config):
+    
+    
+
 
                 
             
-            
-config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, 'config')
-g = Game()
-g.game() 
+local_dir = os.path.dirname(__file__)
+config_path = os.path.join(local_dir, 'config')
+config = neat.Config(Player, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
+
+pop = neat.Population(config)
+stats = neat.StatisticsReporter()
+pop.add_reporter(stats)
+
+winner = pop.run(eval_genomes, 10)
+
+print(winner)
+
+#g = Game()
+#g.game() 
 
     
 
