@@ -21,6 +21,7 @@ class Player(neat.DefaultGenome):
         self.isJumping = False
         self.direction = -1
         self.predictedAction = 0
+        self.net = None
         self.imageName = ["Sprites/GameImages/tRexLeftLeg.png", "Sprites/GameImages/tRexDuck.png", "Sprites/GameImages/tRexRightLeg.png", "Sprites/GameImages/tRexDuckRight.png"]
 
     def configure_new(self, config):

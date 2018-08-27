@@ -4,7 +4,6 @@ import pickle
 import numpy as np
 import neat
 import os
-#from Sprites.Player import Player
 from Sprites.CactusSingle import CactusSingle
 from Sprites.Player import Player
 from Sprites.CactusDouble import CactusDouble
@@ -13,7 +12,7 @@ from Sprites.Bird import Bird
 
 class Game(object):
 
-    def __init__(self, tRexArray):
+    def __init__(self, tRexArray, config):
         self.obstacleProbability = 0.01
         self.obstaclesOnScreen = []
         self.speed = 3.0
@@ -30,7 +29,10 @@ class Game(object):
         self.height = 600
         self.frameCount = 0
         self.screen = pygame.display.set_mode((self.width, self.height))
-        self.trex = tRexArray
+        self.trexs = tRexArray
+        self.config = config
+        for trexId, trex in self.trexs:
+            trex.net = neat.nn.FeedForwardNetwork.create(trex, config)
     
 
     # Display Score on Screen
@@ -66,10 +68,36 @@ class Game(object):
                     self.obstaclesOnScreen.append(CactusTriple(900, 515))
     
     def detectCollisionAndKillTRex(self):
-        if self.trex.detectCollision(self.obstaclesOnScreen[0]) and self.trex.alive:
-            self.trex.score = self.score
-            self.trex.alive = False
-            self.gameOver = True
+        for trexId, trex in self.trexs:
+            if trex.detectCollision(self.obstaclesOnScreen[0]) and trex.alive:
+                trex.score = self.score
+                trex.alive = False
+
+    
+    def getObstacleIndex(self, name):
+        if name == "CactusSingle":
+            return 1
+
+        if name == "CactusDouble":
+            return 2
+
+        return 3
+
+    
+    def predictActionsForTRexs(self):
+        
+        if len(self.obstaclesOnScreen > 0):
+            obstacleNumber = self.getObstacleIndex(obstaclesOnScreen[0].__class__.__name__)
+            input = (float(obstacleNumber), float(obstaclesOnScreen[0].x - 120), float(speed))
+            for trexId, trex in self.trexs:
+                if trex.alive:
+                    output = trex.net.activate(input)
+                    trex.predictedAction = max(output.index(max(output)))
+
+
+                    
+                
+                
 
     
     def makeTrexsJump(self, jmp):
@@ -134,8 +162,11 @@ class Game(object):
 
 
 def eval_genomes(genomes, config):
-    
-    
+    net = neat.nn.FeedForwardNetwork.create(genomes[0][1], config)
+    print(net.activate((3,14,12)))
+
+    for gi, g in genomes:
+        g.fitness = random.randint(0, 10)
 
 
                 
