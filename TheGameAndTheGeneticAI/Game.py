@@ -65,16 +65,17 @@ class Game(object):
     def generateGameObstacles(self):
         if len(self.obstaclesOnScreen) == 0 or self.obstaclesOnScreen[len(self.obstaclesOnScreen) - 1].x < 600:
             if random.uniform(0,1) < self.obstacleProbability:
-                obstacleNumber = random.randint(0, 10)
-                if obstacleNumber <= 4:
+                obstacleNumber = random.randint(0, 3)
+                if obstacleNumber <= 0:
                     self.obstaclesOnScreen.append(CactusSingle(900, 515))
-                elif obstacleNumber <= 6:
+                elif obstacleNumber <= 1:
                     self.obstaclesOnScreen.append(CactusDouble(900, 515))
-                elif obstacleNumber <= 8:
+                elif obstacleNumber <= 2:
                     self.obstaclesOnScreen.append(CactusTriple(900, 515))
-                elif obstacleNumber <= 11:
-                    self.obstaclesOnScreen.append(Bird(900, 475))
-    
+                elif obstacleNumber <= 3:
+                    self.obstaclesOnScreen.append(Bird(900, 485))
+
+       
     def detectCollisionAndKillTRex(self):
         for trexId, trex in self.trexs:
             if trex.detectCollision(self.obstaclesOnScreen[0]) and trex.alive:
@@ -210,7 +211,7 @@ pop = neat.Population(config)
 stats = neat.StatisticsReporter()
 pop.add_reporter(stats)
 
-winner = pop.run(eval_genomes, 50)
+winner = pop.run(eval_genomes, 100)
 
 with open('bestTRex.pickle', 'wb') as handle:
     pickle.dump(winner, handle, protocol = pickle.HIGHEST_PROTOCOL)
