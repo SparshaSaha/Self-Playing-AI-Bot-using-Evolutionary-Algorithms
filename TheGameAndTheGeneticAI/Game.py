@@ -9,6 +9,7 @@ from Sprites.Player import Player
 from Sprites.CactusDouble import CactusDouble
 from Sprites.CactusTriple import CactusTriple
 from Sprites.Bird import Bird
+import pickle
 
 class Game(object):
 
@@ -50,7 +51,12 @@ class Game(object):
     
     def drawCharacter(self):
         
-        self.trex.drawCharacter(self.screen, 0)
+        for trexId, trex in self.trexs:
+            if trex.alive:
+                if trex.predictedAction == 2:
+                    trex.drawCharacter(self.screen, 1)
+                else:
+                    trex.drawCharacter(self.screen, 0)
 
         for obstacles in self.obstaclesOnScreen:
             obstacles.drawCharacter(self.screen)
@@ -59,18 +65,20 @@ class Game(object):
     def generateGameObstacles(self):
         if len(self.obstaclesOnScreen) == 0 or self.obstaclesOnScreen[len(self.obstaclesOnScreen) - 1].x < 600:
             if random.uniform(0,1) < self.obstacleProbability:
-                obstacleNumber = random.randint(0, 9)
+                obstacleNumber = random.randint(0, 10)
                 if obstacleNumber <= 4:
                     self.obstaclesOnScreen.append(CactusSingle(900, 515))
                 elif obstacleNumber <= 6:
                     self.obstaclesOnScreen.append(CactusDouble(900, 515))
                 elif obstacleNumber <= 8:
                     self.obstaclesOnScreen.append(CactusTriple(900, 515))
+                elif obstacleNumber <= 11:
+                    self.obstaclesOnScreen.append(Bird(900, 475))
     
     def detectCollisionAndKillTRex(self):
         for trexId, trex in self.trexs:
             if trex.detectCollision(self.obstaclesOnScreen[0]) and trex.alive:
-                trex.score = self.score
+                trex.fitness = self.score
                 trex.alive = False
 
     
@@ -81,32 +89,49 @@ class Game(object):
         if name == "CactusDouble":
             return 2
 
-        return 3
+        if name == "CactusTriple":
+            return 3
+        
+        else:
+            return 4
 
     
     def predictActionsForTRexs(self):
         
-        if len(self.obstaclesOnScreen > 0):
-            obstacleNumber = self.getObstacleIndex(obstaclesOnScreen[0].__class__.__name__)
-            input = (float(obstacleNumber), float(obstaclesOnScreen[0].x - 120), float(speed))
+        if len(self.obstaclesOnScreen) > 0:
+            obstacleNumber = self.getObstacleIndex(self.obstaclesOnScreen[0].__class__.__name__)
+            if obstacleNumber != 4:
+                input = (float(obstacleNumber), 0, float(self.obstaclesOnScreen[0].x - 120), float(self.speed*100))
+            else:
+                input = (float(obstacleNumber), 100, float(self.obstaclesOnScreen[0].x - 120), float(self.speed*100))
+
             for trexId, trex in self.trexs:
                 if trex.alive:
                     output = trex.net.activate(input)
-                    trex.predictedAction = max(output.index(max(output)))
+                    trex.predictedAction = (output.index(max(output)))
+    
 
+    def allDead(self):
+        for trexId, trex in self.trexs:
+            if trex.alive:
+                return False
+        self.gameOver = True
+        return True
 
                     
                 
                 
 
     
-    def makeTrexsJump(self, jmp):
+    def makeTrexsJump(self):
         
-        if not self.trex.isJumping:
-            if jmp:
-                self.trex.isJumping = True
-        else:
-            self.trex.isJumping, self.trex.direction = self.trex.jump(self.trex.isJumping, self.trex.direction, self.jumpSpeed)
+        for trexId, trex in self.trexs:
+            if trex.alive:
+                if not trex.isJumping:
+                    if trex.predictedAction == 1:
+                        trex.isJumping = True
+                else:
+                    trex.isJumping, trex.direction = trex.jump(trex.isJumping, trex.direction, self.jumpSpeed)
 
     
 
@@ -117,11 +142,19 @@ class Game(object):
                 break
             else:
                 self.score += 1
-            index+=1
+            index += 1
 
         self.obstaclesOnScreen = self.obstaclesOnScreen[index : ]
         for obstacle in self.obstaclesOnScreen:
             obstacle.propagate(self.speed)
+        
+    
+    def increaseGameSpeed(self):
+        if int(self.score/ 5) != self.lastQuotient:
+            self.lastQuotient = int(self.score/ 5)
+            self.speed += 0.15
+            self.jumpSpeed += 0.05
+            
         
     
 
@@ -139,37 +172,35 @@ class Game(object):
                     self.running = False
                     break
 
-            keys = pygame.key.get_pressed()
+            self.predictActionsForTRexs()
 
-            if keys[pygame.K_UP]:
-                self.makeTrexsJump(True)
-            else:
-                self.makeTrexsJump(False)
+            self.makeTrexsJump()
             
 
-            if not self.gameOver:
-                self.drawGameBackground()
-                self.generateGameObstacles()
-                self.cleanDeadObstaclesAndPropagate()
-                self.drawCharacter()
-                self.drawText('score: ' + str(self.score), 20, 700, 50)
+            
+            self.drawGameBackground()
+            self.generateGameObstacles()
+            self.cleanDeadObstaclesAndPropagate()
+            self.drawCharacter()
+            self.drawText('score: ' + str(self.score), 20, 700, 50)
             
             pygame.display.update()
 
             if len(self.obstaclesOnScreen) > 0:
                 self.detectCollisionAndKillTRex()
             
+            if self.allDead():
+                return
+            
+            self.increaseGameSpeed()
+                        
 
 
 def eval_genomes(genomes, config):
-    net = neat.nn.FeedForwardNetwork.create(genomes[0][1], config)
-    print(net.activate((3,14,12)))
-
-    for gi, g in genomes:
-        g.fitness = random.randint(0, 10)
+    g = Game(genomes, config)
+    g.game()
 
 
-                
             
 local_dir = os.path.dirname(__file__)
 config_path = os.path.join(local_dir, 'config')
@@ -179,17 +210,10 @@ pop = neat.Population(config)
 stats = neat.StatisticsReporter()
 pop.add_reporter(stats)
 
-winner = pop.run(eval_genomes, 10)
+winner = pop.run(eval_genomes, 50)
+
+with open('bestTRex.pickle', 'wb') as handle:
+    pickle.dump(winner, handle, protocol = pickle.HIGHEST_PROTOCOL)
+    print("Dumped")
 
 print(winner)
-
-#g = Game()
-#g.game() 
-
-    
-
-
-    
-    
-    
-    
