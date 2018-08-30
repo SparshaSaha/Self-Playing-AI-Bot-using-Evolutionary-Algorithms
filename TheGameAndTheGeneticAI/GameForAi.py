@@ -9,6 +9,7 @@ from Sprites.Player import Player
 from Sprites.CactusDouble import CactusDouble
 from Sprites.CactusTriple import CactusTriple
 from Sprites.Bird import Bird
+from Sprites.Clouds import Cloud
 
 
 class Game(object):
@@ -32,6 +33,12 @@ class Game(object):
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.trexs = tRexArray
         self.config = config
+        self.clouds = []
+        cloud1 = Cloud(930, 50, 930, 0.7)
+        cloud2 = Cloud(1030, 50, 1030, 0.65)
+        cloud3 = Cloud(1030, 100, 1030, 0.5)
+        cloud4 = Cloud(1130, 100, 1130, 0.45)
+        self.clouds = [cloud1, cloud2, cloud3, cloud4]
         for  trex in self.trexs:
             trex.net = neat.nn.FeedForwardNetwork.create(trex, config)
     
@@ -61,6 +68,9 @@ class Game(object):
 
         for obstacles in self.obstaclesOnScreen:
             obstacles.drawCharacter(self.screen)
+        
+        for cloud in self.clouds:
+            cloud.drawCharacter(self.screen)
     
     # Randomly generate game obstacles depending on obstacle probability
     def generateGameObstacles(self):
@@ -152,6 +162,9 @@ class Game(object):
         self.obstaclesOnScreen = self.obstaclesOnScreen[index : ]
         for obstacle in self.obstaclesOnScreen:
             obstacle.propagate(self.speed)
+        
+        for cloud in self.clouds:
+            cloud.propagate()
         
     
     def increaseGameSpeed(self):

@@ -1,6 +1,4 @@
 import pygame
-import numpy as np
-import random
 import neat
 class Player(neat.DefaultGenome):
     def __init__(self, key):
