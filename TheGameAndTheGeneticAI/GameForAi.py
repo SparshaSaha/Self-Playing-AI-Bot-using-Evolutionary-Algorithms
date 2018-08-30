@@ -9,10 +9,10 @@ from Sprites.Player import Player
 from Sprites.CactusDouble import CactusDouble
 from Sprites.CactusTriple import CactusTriple
 from Sprites.Bird import Bird
-import pickle
+
 
 class Game(object):
-
+    
     def __init__(self, tRexArray, config):
         self.obstacleProbability = 0.01
         self.obstaclesOnScreen = []
@@ -32,7 +32,7 @@ class Game(object):
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.trexs = tRexArray
         self.config = config
-        for trexId, trex in self.trexs:
+        for  trex in self.trexs:
             trex.net = neat.nn.FeedForwardNetwork.create(trex, config)
     
 
@@ -52,7 +52,7 @@ class Game(object):
     # Draw obstacles and trexs on screen
     def drawCharacter(self):
         
-        for trexId, trex in self.trexs:
+        for   trex in self.trexs:
             if trex.alive:
                 if trex.predictedAction == 2:
                     trex.drawCharacter(self.screen, 1)
@@ -79,7 +79,7 @@ class Game(object):
     
     # Kill trexs on collision
     def detectCollisionAndKillTRex(self):
-        for trexId, trex in self.trexs:
+        for   trex in self.trexs:
             if trex.detectCollision(self.obstaclesOnScreen[0]) and trex.alive:
                 trex.fitness = self.score
                 trex.alive = False
@@ -109,7 +109,7 @@ class Game(object):
             else:
                 input = (float(obstacleNumber), 100, float(self.obstaclesOnScreen[0].x - 120), float(self.speed*100))
 
-            for trexId, trex in self.trexs:
+            for   trex in self.trexs:
                 if trex.alive:
                     output = trex.net.activate(input)
                     trex.predictedAction = (output.index(max(output)))
@@ -117,7 +117,7 @@ class Game(object):
 
     # Check if generation of Trexs are extinct
     def allDead(self):
-        for trexId, trex in self.trexs:
+        for   trex in self.trexs:
             if trex.alive:
                 return False
         self.gameOver = True
@@ -130,7 +130,7 @@ class Game(object):
     
     def makeTrexsJump(self):
         
-        for trexId, trex in self.trexs:
+        for   trex in self.trexs:
             if trex.alive:
                 if not trex.isJumping:
                     if trex.predictedAction == 1:
@@ -198,26 +198,21 @@ class Game(object):
                 return
             
             self.increaseGameSpeed()
-                        
 
-
-def eval_genomes(genomes, config):
-    g = Game(genomes, config)
-    g.game()
-
-
-            
 local_dir = os.path.dirname(__file__)
 config_path = os.path.join(local_dir, 'config')
 config = neat.Config(Player, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
-pop = neat.Population(config)
-stats = neat.StatisticsReporter()
-pop.add_reporter(stats)
+player = None
 
-winner = pop.run(eval_genomes, 100)
+with open('bestTRex.pickle', 'rb') as handle:
+    player = pickle.load(handle)
 
-# Save winner in a file
-with open('bestTRex.pickle', 'wb') as handle:
-    pickle.dump(winner, handle, protocol = pickle.HIGHEST_PROTOCOL)
+print(player)
+player.alive = True
+x=[]
+x.append(player)
 
+gam = Game(x, config)
+
+gam.game()
