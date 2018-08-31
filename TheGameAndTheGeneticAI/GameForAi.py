@@ -226,6 +226,6 @@ player.alive = True
 x=[]
 x.append(player)
 
-gam = Game(x, config)
+game = Game(x, config)
 
-gam.game()
+game.game()
