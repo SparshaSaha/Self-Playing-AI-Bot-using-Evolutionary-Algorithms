@@ -13,7 +13,7 @@ The Algorithm uses Neuro Evolution of Augmented Topologies (NEAT) algorithm to t
 1> TheGame
 This contains the Game written in pygame and playbale by humans
 
-2>.TheGameAndTheGeneticAI
+2> TheGameAndTheGeneticAI
 
 i> Game.py contains the code to train the AI
 
