@@ -4,6 +4,8 @@ import pickle
 import numpy as np
 import neat
 import os
+import visualize
+
 from Sprites.CactusSingle import CactusSingle
 from Sprites.Player import Player
 from Sprites.CactusDouble import CactusDouble
@@ -223,7 +225,7 @@ with open('bestTRex.pickle', 'rb') as handle:
 
 print(player)
 player.alive = True
-
+visualize.draw_net(config, player, True)
 
 game = Game([player], config)
 
