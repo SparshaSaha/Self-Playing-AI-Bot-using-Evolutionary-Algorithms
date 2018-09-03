@@ -136,10 +136,7 @@ class Game(object):
         return True
 
                     
-                
-                
-
-    
+    # Make the TRrexs to jump
     def makeTrexsJump(self):
         
         for   trex in self.trexs:
@@ -151,7 +148,7 @@ class Game(object):
                     trex.isJumping, trex.direction = trex.jump(trex.isJumping, trex.direction, self.jumpSpeed)
 
     
-
+    # Clean obstacles which has passed player
     def cleanDeadObstaclesAndPropagate(self):
         index = 0
         for obstacle in self.obstaclesOnScreen:
@@ -168,7 +165,7 @@ class Game(object):
         for cloud in self.clouds:
             cloud.propagate()
         
-    
+    # Increase Game Speed
     def increaseGameSpeed(self):
         if int(self.score/ 5) != self.lastQuotient:
             self.lastQuotient = int(self.score/ 5)
@@ -177,7 +174,7 @@ class Game(object):
             
         
     
-
+    # Run the game
     def game(self):
         pygame.init()
         pygame.display.set_caption('T-Rex Runner')
@@ -195,8 +192,6 @@ class Game(object):
             self.predictActionsForTRexs()
 
             self.makeTrexsJump()
-            
-
             
             self.drawGameBackground()
             self.generateGameObstacles()
