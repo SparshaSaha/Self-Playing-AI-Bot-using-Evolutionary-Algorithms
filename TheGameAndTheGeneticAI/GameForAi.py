@@ -223,9 +223,8 @@ with open('bestTRex.pickle', 'rb') as handle:
 
 print(player)
 player.alive = True
-x=[]
-x.append(player)
 
-gam = Game(x, config)
 
-gam.game()
+game = Game([player], config)
+
+game.game()
