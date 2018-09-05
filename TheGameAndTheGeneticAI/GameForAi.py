@@ -4,12 +4,15 @@ import pickle
 import numpy as np
 import neat
 import os
+import visualize
+
 from Sprites.CactusSingle import CactusSingle
 from Sprites.Player import Player
 from Sprites.CactusDouble import CactusDouble
 from Sprites.CactusTriple import CactusTriple
 from Sprites.Bird import Bird
 from Sprites.Clouds import Cloud
+from Sprites.Dashes import Dashes
 
 
 class Game(object):
@@ -33,6 +36,7 @@ class Game(object):
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.trexs = tRexArray
         self.config = config
+        self.dashes = []
         self.clouds = []
         cloud1 = Cloud(930, 50, 930, 0.7)
         cloud2 = Cloud(1030, 50, 1030, 0.65)
@@ -54,6 +58,7 @@ class Game(object):
     # Draw the game background
     def drawGameBackground(self):
         self.screen.fill(self.background_colour)
+        pygame.draw.rect(self.screen, (0, 0, 0), (0, 550, 900, 1), 1)
 
     
     # Draw obstacles and trexs on screen
@@ -94,7 +99,7 @@ class Game(object):
                 trex.fitness = self.score
                 trex.alive = False
 
-    
+    # Get Obstacle Info
     def getObstacleIndex(self, name):
         if name == "CactusSingle":
             return 1
@@ -134,10 +139,7 @@ class Game(object):
         return True
 
                     
-                
-                
-
-    
+    # Make the TRrexs to jump
     def makeTrexsJump(self):
         
         for   trex in self.trexs:
@@ -149,7 +151,7 @@ class Game(object):
                     trex.isJumping, trex.direction = trex.jump(trex.isJumping, trex.direction, self.jumpSpeed)
 
     
-
+    # Clean obstacles which has passed player
     def cleanDeadObstaclesAndPropagate(self):
         index = 0
         for obstacle in self.obstaclesOnScreen:
@@ -166,16 +168,38 @@ class Game(object):
         for cloud in self.clouds:
             cloud.propagate()
         
-    
+    # Increase Game Speed
     def increaseGameSpeed(self):
         if int(self.score/ 5) != self.lastQuotient:
             self.lastQuotient = int(self.score/ 5)
             self.speed += 0.15
             self.jumpSpeed += 0.05
-            
+    
+    # Create dashes which signify ground
+    def createDashes(self):
+        possibleYCoords = [555, 565, 575]
+        chosenYCoord = random.choice(possibleYCoords)
+        self.dashes.append(Dashes(899, chosenYCoord))
+    
+    # Remove dashes which have passed the screen and propagate dashes
+    def removeDeadDashesAndPropagate(self):
+        index = 0
+        for dash in self.dashes:
+            if dash.x > 0:
+                break
+            index += 1
+        self.dashes = self.dashes[index : ]
+        for dash in self.dashes:
+            dash.propagate(self.speed)
+    
+    # Draw dashes on screen
+    def drawDashes(self):
+        for dash in self.dashes:
+            dash.drawCharacter(self.screen)
+
         
     
-
+    # Run the game
     def game(self):
         pygame.init()
         pygame.display.set_caption('T-Rex Runner')
@@ -194,13 +218,19 @@ class Game(object):
 
             self.makeTrexsJump()
             
-
-            
             self.drawGameBackground()
             self.generateGameObstacles()
             self.cleanDeadObstaclesAndPropagate()
             self.drawCharacter()
             self.drawText('score: ' + str(self.score), 20, 700, 50)
+            
+            if len(self.dashes) == 0:
+                self.createDashes()
+            elif self.dashes[0].x < 890:
+                self.createDashes()
+            
+            self.removeDeadDashesAndPropagate()
+            self.drawDashes()
             
             pygame.display.update()
 
@@ -223,7 +253,7 @@ with open('bestTRex.pickle', 'rb') as handle:
 
 print(player)
 player.alive = True
-
+#visualize.draw_net(config, player, True)
 
 game = Game([player], config)
 
