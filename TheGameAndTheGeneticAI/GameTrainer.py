@@ -123,10 +123,6 @@ class Game(object):
         self.gameOver = True
         return True
 
-                    
-                
-                
-
     
     def makeTrexsJump(self):
         

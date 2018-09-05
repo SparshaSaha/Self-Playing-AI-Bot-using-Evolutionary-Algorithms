@@ -12,6 +12,7 @@ from Sprites.CactusDouble import CactusDouble
 from Sprites.CactusTriple import CactusTriple
 from Sprites.Bird import Bird
 from Sprites.Clouds import Cloud
+from Sprites.Dashes import Dashes
 
 
 class Game(object):
@@ -35,6 +36,7 @@ class Game(object):
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.trexs = tRexArray
         self.config = config
+        self.dashes = []
         self.clouds = []
         cloud1 = Cloud(930, 50, 930, 0.7)
         cloud2 = Cloud(1030, 50, 1030, 0.65)
@@ -171,7 +173,16 @@ class Game(object):
             self.lastQuotient = int(self.score/ 5)
             self.speed += 0.15
             self.jumpSpeed += 0.05
-            
+    
+    def createDashes(self):
+        possibleYCoords = [550, 560, 570, 580]
+        chosenYCoord = random.choice(possibleYCoords)
+        self.dashes.append(Dashes(910, chosenYCoord))
+    
+    def removeDeadDashesAndPropagate(self):
+        index = 0
+        
+
         
     
     # Run the game
