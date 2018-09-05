@@ -58,6 +58,7 @@ class Game(object):
     # Draw the game background
     def drawGameBackground(self):
         self.screen.fill(self.background_colour)
+        pygame.draw.rect(self.screen, (0, 0, 0), (0, 550, 900, 1), 1)
 
     
     # Draw obstacles and trexs on screen
@@ -98,7 +99,7 @@ class Game(object):
                 trex.fitness = self.score
                 trex.alive = False
 
-    
+    # Get Obstacle Info
     def getObstacleIndex(self, name):
         if name == "CactusSingle":
             return 1
@@ -174,14 +175,27 @@ class Game(object):
             self.speed += 0.15
             self.jumpSpeed += 0.05
     
+    # Create dashes which signify ground
     def createDashes(self):
-        possibleYCoords = [550, 560, 570, 580]
+        possibleYCoords = [555, 565, 575]
         chosenYCoord = random.choice(possibleYCoords)
-        self.dashes.append(Dashes(910, chosenYCoord))
+        self.dashes.append(Dashes(899, chosenYCoord))
     
+    # Remove dashes which have passed the screen and propagate dashes
     def removeDeadDashesAndPropagate(self):
         index = 0
-        
+        for dash in self.dashes:
+            if dash.x > 0:
+                break
+            index += 1
+        self.dashes = self.dashes[index : ]
+        for dash in self.dashes:
+            dash.propagate(self.speed)
+    
+    # Draw dashes on screen
+    def drawDashes(self):
+        for dash in self.dashes:
+            dash.drawCharacter(self.screen)
 
         
     
@@ -210,6 +224,14 @@ class Game(object):
             self.drawCharacter()
             self.drawText('score: ' + str(self.score), 20, 700, 50)
             
+            if len(self.dashes) == 0:
+                self.createDashes()
+            elif self.dashes[0].x < 890:
+                self.createDashes()
+            
+            self.removeDeadDashesAndPropagate()
+            self.drawDashes()
+            
             pygame.display.update()
 
             if len(self.obstaclesOnScreen) > 0:
@@ -231,7 +253,7 @@ with open('bestTRex.pickle', 'rb') as handle:
 
 print(player)
 player.alive = True
-visualize.draw_net(config, player, True)
+#visualize.draw_net(config, player, True)
 
 game = Game([player], config)
 
