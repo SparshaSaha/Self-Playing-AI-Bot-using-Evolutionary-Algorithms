@@ -214,6 +214,6 @@ pop.add_reporter(stats)
 winner = pop.run(eval_genomes, 100)
 
 # Save winner in a file
-with open('bestTRex.pickle', 'wb') as handle:
+with open('bestTRex_better.pickle', 'wb') as handle:
     pickle.dump(winner, handle, protocol = pickle.HIGHEST_PROTOCOL)
 

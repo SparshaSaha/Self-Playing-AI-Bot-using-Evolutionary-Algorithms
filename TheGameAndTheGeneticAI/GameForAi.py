@@ -207,7 +207,7 @@ class Game(object):
         pygame.display.flip()
 
         while self.running:
-            self.clock.tick(100)
+            self.clock.tick(110)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
