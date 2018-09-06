@@ -18,3 +18,6 @@ This contains the Game written in pygame and playbale by humans
 i> Game.py contains the code to train the AI
 
 ii> GameForAi.py contains the game played by the best trained AI
+
+<script src="http://api.html5media.info/1.1.8/html5media.min.js"></script>
+<video src="TRexVideo.mp4" width="320" height="200" controls preload></video>
