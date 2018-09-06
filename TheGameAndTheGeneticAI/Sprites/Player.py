@@ -3,8 +3,7 @@ import numpy as np
 import random
 import neat
 class Player(neat.DefaultGenome):
-    def __init__(self, key):
-        
+    def __init__(self, key):        
         super().__init__(key)
 
         # Define player properties
@@ -31,9 +30,11 @@ class Player(neat.DefaultGenome):
     def configure_crossover(self, genome1, genome2, config):
         super().configure_crossover(genome1, genome2, config)
     
+
     def mutate(self, config):
         super().mutate(config)
     
+
     def distance(self, other, config):
         return super().distance(other, config)
         
@@ -49,6 +50,7 @@ class Player(neat.DefaultGenome):
             self.hitbox = (self.x, self.y[0], 38, 40)
             self.hitboxRectStanding = pygame.Rect(self.x, self.y[0], 41, 40)
             self.hitboxRect = self.hitboxRectStanding
+
         else:
             self.hitboxRectDucking = pygame.Rect(self.x, self.y[1], 58, 30)
             self.hitbox = (self.x, self.y[1], 58, 30)
@@ -56,9 +58,9 @@ class Player(neat.DefaultGenome):
 
         self.frameCount += 1
 
-        canvas.blit(pygame.image.load(self.imageName[self.currentImageIndex]), (self.x,self.y[index]))
+        canvas.blit(pygame.image.load(self.imageName[self.currentImageIndex]), (self.x, self.y[index]))
 
-        #pygame.draw.rect(canvas, (255, 0, 0), self.hitbox,2)
+        pygame.draw.rect(canvas, (255, 0, 0), self.hitbox, 2)
 
     def jump(self, jump, direction, jumpSpeed):
         self.y[0] += jumpSpeed * direction

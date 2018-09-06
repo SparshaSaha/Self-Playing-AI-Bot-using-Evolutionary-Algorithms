@@ -64,8 +64,10 @@ class Game(object):
     # Draw obstacles and trexs on screen
     def drawCharacter(self):
         
-        for   trex in self.trexs:
-            if trex.alive:
+        for trex in self.trexs:
+            if trex.isJumping:
+                trex.drawCharacter(self.screen, 0)
+            elif trex.alive:
                 if trex.predictedAction == 2:
                     trex.drawCharacter(self.screen, 1)
                 else:
@@ -248,12 +250,12 @@ config = neat.Config(Player, neat.DefaultReproduction, neat.DefaultSpeciesSet, n
 
 player = None
 
-with open('bestTRex.pickle', 'rb') as handle:
+with open('bestTRex_better.pickle', 'rb') as handle:
     player = pickle.load(handle)
 
 print(player)
 player.alive = True
-#visualize.draw_net(config, player, True)
+visualize.draw_net(config, player, True)
 
 game = Game([player], config)
 
