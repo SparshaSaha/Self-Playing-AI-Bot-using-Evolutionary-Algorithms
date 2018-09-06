@@ -60,7 +60,7 @@ class Player(neat.DefaultGenome):
 
         canvas.blit(pygame.image.load(self.imageName[self.currentImageIndex]), (self.x, self.y[index]))
 
-        pygame.draw.rect(canvas, (255, 0, 0), self.hitbox, 2)
+        #pygame.draw.rect(canvas, (255, 0, 0), self.hitbox, 2)
 
     def jump(self, jump, direction, jumpSpeed):
         self.y[0] += jumpSpeed * direction
