@@ -18,3 +18,6 @@ This contains the Game written in pygame and playbale by humans
 i> Game.py contains the code to train the AI
 
 ii> GameForAi.py contains the game played by the best trained AI
+
+Video Link:
+https://youtu.be/fLJsuVCr5L0
