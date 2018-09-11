@@ -91,16 +91,16 @@ class Game(object):
     
     def getObstacleIndex(self, name):
         if name == "CactusSingle":
-            return 1
+            return (15, 30)
 
         if name == "CactusDouble":
-            return 2
+            return (30, 30)
 
         if name == "CactusTriple":
-            return 3
+            return (45, 30)
         
         else:
-            return 4
+            return (45, 27)
 
     
     # Predict actions for all trexs which are alive
