@@ -109,9 +109,9 @@ class Game(object):
         if len(self.obstaclesOnScreen) > 0:
             obstacleNumber = self.getObstacleIndex(self.obstaclesOnScreen[0].__class__.__name__)
             if obstacleNumber != 4:
-                input = (float(obstacleNumber), 0, float(self.obstaclesOnScreen[0].x - 120), float(self.speed*100))
+                input = (float(obstacleNumber[0]),float(obstacleNumber[1]), 0, float(self.obstaclesOnScreen[0].x - 120), float(self.speed*100))
             else:
-                input = (float(obstacleNumber), 100, float(self.obstaclesOnScreen[0].x - 120), float(self.speed*100))
+                input = (float(obstacleNumber[0]),float(obstacleNumber[1]), 100, float(self.obstaclesOnScreen[0].x - 120), float(self.speed*100))
 
             for trexId, trex in self.trexs:
                 if trex.alive:
