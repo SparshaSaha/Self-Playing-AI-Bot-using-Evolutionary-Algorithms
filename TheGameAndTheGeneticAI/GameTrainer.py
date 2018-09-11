@@ -53,11 +53,15 @@ class Game(object):
     def drawCharacter(self):
         
         for trexId, trex in self.trexs:
+
             if trex.alive:
-                if trex.predictedAction == 2:
-                    trex.drawCharacter(self.screen, 1)
-                else:
+                if trex.isJumping:
                     trex.drawCharacter(self.screen, 0)
+                else:
+                    if trex.predictedAction == 2:
+                        trex.drawCharacter(self.screen, 1)
+                    else:
+                        trex.drawCharacter(self.screen, 0)
 
         for obstacles in self.obstaclesOnScreen:
             obstacles.drawCharacter(self.screen)

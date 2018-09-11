@@ -144,7 +144,7 @@ class Game(object):
     # Make the TRrexs to jump
     def makeTrexsJump(self):
         
-        for   trex in self.trexs:
+        for trex in self.trexs:
             if trex.alive:
                 if not trex.isJumping:
                     if trex.predictedAction == 1:
