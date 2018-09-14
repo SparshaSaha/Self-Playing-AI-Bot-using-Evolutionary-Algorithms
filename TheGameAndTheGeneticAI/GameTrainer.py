@@ -11,6 +11,7 @@ from Sprites.CactusTriple import CactusTriple
 from Sprites.Bird import Bird
 import pickle
 
+global GENERATION_NUMBER = 1
 class Game(object):
 
     def __init__(self, tRexArray, config):
@@ -202,6 +203,8 @@ class Game(object):
 
 
 def eval_genomes(genomes, config):
+    print(GENERATION_NUMBER)
+    GENERATION_NUMBER += 1
     g = Game(genomes, config)
     g.game()
 
@@ -215,7 +218,7 @@ pop = neat.Population(config)
 stats = neat.StatisticsReporter()
 pop.add_reporter(stats)
 
-winner = pop.run(eval_genomes, 500)
+winner = pop.run(eval_genomes, 100)
 
 # Save winner in a file
 with open('bestTRex_better.pickle', 'wb') as handle:
