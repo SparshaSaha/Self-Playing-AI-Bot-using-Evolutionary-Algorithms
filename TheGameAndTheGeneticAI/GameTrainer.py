@@ -215,7 +215,7 @@ pop = neat.Population(config)
 stats = neat.StatisticsReporter()
 pop.add_reporter(stats)
 
-winner = pop.run(eval_genomes, 100)
+winner = pop.run(eval_genomes, 500)
 
 # Save winner in a file
 with open('bestTRex_better.pickle', 'wb') as handle:
