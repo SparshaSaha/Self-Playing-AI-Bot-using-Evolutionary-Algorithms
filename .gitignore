@@ -1,4 +1,5 @@
-/*.pyc
+*/*.pyc
 *.gv*
 *.yml
-/*__pycache__*
+*/__pycache__
+*/Sprites/__pycache__/
