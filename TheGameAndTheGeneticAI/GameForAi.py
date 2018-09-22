@@ -126,10 +126,19 @@ class Game(object):
             else:
                 input = (float(obstacleNumber), 100, float(self.obstaclesOnScreen[0].x - 120), float(self.speed*100))
 
-            for   trex in self.trexs:
+            for trex in self.trexs:
                 if trex.alive:
                     output = trex.net.activate(input)
                     trex.predictedAction = (output.index(max(output)))
+        
+        else:
+            input = (float(30),float(30), 0, float(9500), float(self.speed*100))
+
+            for trexId, trex in self.trexs:
+                if trex.alive:
+                    output = trex.net.activate(input)
+                    trex.predictedAction = (output.index(max(output)))
+
     
 
     # Check if generation of Trexs are extinct
