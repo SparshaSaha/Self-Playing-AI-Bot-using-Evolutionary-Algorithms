@@ -1,3 +1,4 @@
 /*.pyc
 *.gv*
 *.yml
+/*__pycache__*
