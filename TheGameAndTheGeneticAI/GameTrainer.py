@@ -190,8 +190,6 @@ class Game(object):
 
             self.makeTrexsJump()
             
-
-            
             self.drawGameBackground()
             self.generateGameObstacles()
             self.cleanDeadObstaclesAndPropagate()
