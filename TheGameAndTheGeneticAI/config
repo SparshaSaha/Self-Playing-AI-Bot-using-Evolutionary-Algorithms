@@ -4,12 +4,12 @@
 # or the experiment itself.  This is the only required section.
 [NEAT]
 fitness_criterion     = max
-fitness_threshold     = 1000.0
+fitness_threshold     = 10000.0
 pop_size              = 300
 reset_on_extinction   = 1
 
 [Player]
-num_inputs              = 4
+num_inputs              = 5
 num_hidden              = 6
 num_outputs             = 3
 initial_connection      = partial_direct 0.5

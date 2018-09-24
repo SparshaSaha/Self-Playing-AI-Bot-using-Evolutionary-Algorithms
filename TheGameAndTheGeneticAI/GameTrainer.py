@@ -91,16 +91,16 @@ class Game(object):
     
     def getObstacleIndex(self, name):
         if name == "CactusSingle":
-            return 1
+            return (15, 30)
 
         if name == "CactusDouble":
-            return 2
+            return (30, 30)
 
         if name == "CactusTriple":
-            return 3
+            return (45, 30)
         
         else:
-            return 4
+            return (45, 27)
 
     
     # Predict actions for all trexs which are alive
@@ -108,15 +108,24 @@ class Game(object):
         
         if len(self.obstaclesOnScreen) > 0:
             obstacleNumber = self.getObstacleIndex(self.obstaclesOnScreen[0].__class__.__name__)
-            if obstacleNumber != 4:
-                input = (float(obstacleNumber), 0, float(self.obstaclesOnScreen[0].x - 120), float(self.speed*100))
+            if obstacleNumber[1] != 27:
+                input = (float(obstacleNumber[0]),float(obstacleNumber[1]), 0, float(self.obstaclesOnScreen[0].x - 120), float(self.speed*100))
             else:
-                input = (float(obstacleNumber), 100, float(self.obstaclesOnScreen[0].x - 120), float(self.speed*100))
+                input = (float(obstacleNumber[0]),float(obstacleNumber[1]), 100, float(self.obstaclesOnScreen[0].x - 120), float(self.speed*100))
 
             for trexId, trex in self.trexs:
                 if trex.alive:
                     output = trex.net.activate(input)
                     trex.predictedAction = (output.index(max(output)))
+        else:
+
+            input = (float(30),float(30), 0, float(9500), float(self.speed*100))
+
+            for trexId, trex in self.trexs:
+                if trex.alive:
+                    output = trex.net.activate(input)
+                    trex.predictedAction = (output.index(max(output)))
+
     
 
     # Check if generation of Trexs are extinct
@@ -181,8 +190,6 @@ class Game(object):
 
             self.makeTrexsJump()
             
-
-            
             self.drawGameBackground()
             self.generateGameObstacles()
             self.cleanDeadObstaclesAndPropagate()
@@ -201,23 +208,42 @@ class Game(object):
                         
 
 
-def eval_genomes(genomes, config):
-    g = Game(genomes, config)
-    g.game()
 
 
-            
-local_dir = os.path.dirname(__file__)
-config_path = os.path.join(local_dir, 'config')
-config = neat.Config(Player, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
-pop = neat.Population(config)
-stats = neat.StatisticsReporter()
-pop.add_reporter(stats)
+class Simulate(object):
+    def __init__(self):
+        self.GENERATION_NUMBER = 0
 
-winner = pop.run(eval_genomes, 100)
+    def main(self):        
+        local_dir = os.path.dirname(__file__)
+        config_path = os.path.join(local_dir, 'config')
+        config = neat.Config(Player, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
-# Save winner in a file
-with open('bestTRex_better.pickle', 'wb') as handle:
-    pickle.dump(winner, handle, protocol = pickle.HIGHEST_PROTOCOL)
+        pop = neat.Population(config)
+        stats = neat.StatisticsReporter()
+        pop.add_reporter(stats)
 
+        winner = pop.run(self.eval_genomes, 50)
+
+        # Save winner in a file
+        with open('bestTRex_better.pickle', 'wb') as handle:
+            pickle.dump(winner, handle, protocol = pickle.HIGHEST_PROTOCOL)
+
+    def eval_genomes(self, genomes, config):
+        
+        self.GENERATION_NUMBER += 1
+        for _, trex in genomes:
+            trex.alive = True
+        g = Game(genomes, config)
+        g.game()
+
+        maxScore = 0
+        for _, trex in genomes:
+            if trex.fitness > maxScore:
+                maxScore = trex.fitness
+        
+        print("Max score for generation : "+str(self.GENERATION_NUMBER)+ " is "+str(maxScore))
+
+sim = Simulate()
+sim.main()
