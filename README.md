@@ -7,7 +7,9 @@ A self-playing bot built with NEAT-python for Chrome T-Rex game recreated in pyg
 3. Pygame
 
 ## Algorithm
-The Algorithm uses Neuro Evolution of Augmented Topologies (NEAT) algorithm to train the best player among multiple generations and use that player to play the game
+We have used **NEURO EVOLUTION OF AUGMENTED TOPOLOGIES (NEAT)** for designing the AI-bot. NEAT is a very handy algorithm and is actively used in AI design. More information about **NEAT** can be found [here](http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf).
+
+There is a great python library for **NEAT** in python developed by [CodeReclaimers](https://github.com/CodeReclaimers). We have used **NEAT Python** for implementing **NEAT** for the evolution of our AI-bot.
 
 ## Folder and Files Description
 1> TheGame
