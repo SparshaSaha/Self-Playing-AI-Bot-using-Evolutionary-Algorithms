@@ -22,5 +22,4 @@ i> Game.py contains the code to train the AI
 ii> GameForAi.py contains the game played by the best trained AI
 
 Video Link:
-![Alt Text](https://youtu.be/fLJsuVCr5L0)
 https://youtu.be/fLJsuVCr5L0
